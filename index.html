@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Performance Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-top: 200px; /* Increased space from top */
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin: 0 0 20px;
+        }
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        form input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .result-detail {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prediction</h1>
+        <form id="predict-form">
+            <label for="total_parts_made">Total Parts Made:</label>
+            <input type="number" id="total_parts_made" required min="0" placeholder="e.g., 1000">
+            
+            <label for="defective_parts_repairable">Defective Parts Repairable:</label>
+            <input type="number" id="defective_parts_repairable" required min="0" placeholder="e.g., 50">
+            
+            <label for="defective_parts_scrap">Defective Parts Scrap:</label>
+            <input type="number" id="defective_parts_scrap" required min="0" placeholder="e.g., 10">
+            
+            <label for="experience_company">Experience in Company (Years):</label>
+            <input type="number" id="experience_company" required min="0" placeholder="e.g., 5">
+            
+            <label for="leadership_experience">Leadership Experience (Years):</label>
+            <input type="number" id="leadership_experience" required min="0" placeholder="e.g., 3">
+            
+            <label for="attendance_percentage">Attendance Percentage:</label>
+            <input type="number" step="0.01" id="attendance_percentage" required min="0" max="100" placeholder="e.g., 95.5">
+            
+            <label for="late_percentage">Late Percentage:</label>
+            <input type="number" step="0.01" id="late_percentage" required min="0" max="100" placeholder="e.g., 2.5">
+            
+            <label for="work_dedication_percentage">Work Dedication Percentage:</label>
+            <input type="number" step="0.01" id="work_dedication_percentage" required min="0" max="100" placeholder="e.g., 88.3">
+            
+            <label for="salary">Salary:</label>
+            <input type="number" step="0.01" id="salary" required min="0" placeholder="e.g., 50000">
+            
+            <button type="submit">Predict</button>
+        </form>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        async function predict(event) {
+            event.preventDefault();  // Prevent the page reload
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    total_parts_made: document.getElementById('total_parts_made').value,
+                    defective_parts_repairable: document.getElementById('defective_parts_repairable').value,
+                    defective_parts_scrap: document.getElementById('defective_parts_scrap').value,
+                    experience_company: document.getElementById('experience_company').value,
+                    leadership_experience: document.getElementById('leadership_experience').value,
+                    attendance_percentage: document.getElementById('attendance_percentage').value,
+                    late_percentage: document.getElementById('late_percentage').value,
+                    work_dedication_percentage: document.getElementById('work_dedication_percentage').value,
+                    salary: document.getElementById('salary').value
+                })
+            });
+
+            const data = await response.json();
+
+            // Display the result
+            let resultText = `Result: ${data.result}`;
+            let additionalInfo = '';
+            if (data.calculated_bonus) {
+                additionalInfo += `<div class="result-detail">Calculated Bonus: ${data.calculated_bonus}</div>`;
+            }
+            if (data.calculated_increment) {
+                additionalInfo += `<div class="result-detail">Calculated Increment: ${data.calculated_increment}</div>`;
+            }
+            document.getElementById('result').innerHTML = `${resultText}<br>${additionalInfo}`;
+        }
+
+        // Attach the predict function to the form submit event
+        document.getElementById('predict-form').addEventListener('submit', predict);
+    </script>
+</body>
+</html>
